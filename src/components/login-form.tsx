@@ -6,7 +6,9 @@ import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
+import { useAuth } from "../hooks/useAuth"
+import type { LoginData } from "../services/auth/types"
 
 
 export function LoginForm({
@@ -14,14 +16,37 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
 
+  const [email, setEmail] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
 
   const [isShowPW, setIsShowPW] = useState(false)
+  const { login } = useAuth()
+
+  const handleSubmit = async(e: FormEvent) => {
+    e.preventDefault()
+    if (!email.trim() || !password.trim()) {
+      return
+    }
+
+    const data: LoginData = {
+      email: email,
+      password: password
+    }
+
+    await login(data)
+
+    setEmail('')
+    setPassword('')
+
+  }
+
+
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -34,6 +59,8 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="m@example.com"
                   required
                 />
@@ -53,6 +80,8 @@ export function LoginForm({
                     id="password"
                     type={isShowPW ? 'text' : 'password'}
                     placeholder="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                   <button

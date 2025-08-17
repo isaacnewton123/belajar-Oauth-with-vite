@@ -4,21 +4,62 @@ import { Button } from "./ui/button"
 import { Card, CardContent } from "./ui/card"
 import { Input } from "./ui/input"
 import { Label } from "./ui/label"
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
 import { FaEye, FaEyeSlash } from "react-icons/fa"
+import { useAuth } from "../hooks/useAuth"
+import { toast } from "react-toastify"
+import type { RegisterData } from "../services/auth/types"
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
 
+  const [name, setName] = useState<string>('')
+  const [email, setEmail] = useState<string>('')
+  const [password,setPassword] = useState<string>('')
+  const [resubmit, setResubmit] = useState<string>('')
+
+  const {register} = useAuth()
+
   const [isShowPW, setIsShowPW] = useState(false)
 
+
+  const handleSubmit = async(e: FormEvent) => {
+    e.preventDefault()
+    if(!email.trim() || !password.trim() || !name.trim()) {
+      toast.error('please fill in the correct credentials')
+      return
+    }
+
+    if(password !== resubmit) {
+      return
+    }
+
+    if(password.length < 6) {
+      toast.error('You must enter a password of at least 6 letters.')
+      return
+    }
+
+    const data : RegisterData = {
+      name: name,
+      email: email,
+      password: password
+    }
+
+   await register(data)
+
+    setName('')
+    setEmail('')
+    setPassword('')
+    setResubmit('')
+
+  }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-3xl font-bold">Welcome</h1>
@@ -31,6 +72,8 @@ export function RegisterForm({
                 <Input
                   id="name"
                   type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Uzumaki Baut"
                   required
                 />
@@ -40,6 +83,8 @@ export function RegisterForm({
                 <Input
                   id="email"
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="m@example.com"
                   required
                 />
@@ -53,6 +98,8 @@ export function RegisterForm({
                     id="password"
                     type={isShowPW ? 'text' : 'password'}
                     placeholder="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                   <button
@@ -71,6 +118,8 @@ export function RegisterForm({
                   <Input
                     id="resubmit-password"
                     type={isShowPW ? 'text' : 'password'}
+                    value={resubmit}
+                    onChange={(e) => setResubmit(e.target.value)}
                     placeholder="resubmit-password"
                     required
                   />
