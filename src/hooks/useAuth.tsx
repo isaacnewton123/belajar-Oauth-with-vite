@@ -9,6 +9,22 @@ export const useAuth = () => {
     const {setUser, setLoading} = useAuthContext()
     const navigate = useNavigate()
 
+    const getCurrentUser = async() => {
+        setLoading(true)
+        try {
+            const response = await authApi.getMe()
+            localStorage.setItem('user', JSON.stringify(response.data))
+            setUser(response.data)
+        } catch (error) {
+            console.error('error in getMe hooks', error)
+            toast.error('cannot Get Profile , please try again later')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+
+
     const login = async(userData: LoginData) => {
         setLoading(true)
         try {
@@ -16,9 +32,8 @@ export const useAuth = () => {
 
             if (response && response.user && response.token) {
                 localStorage.setItem('token', response.token)
-                localStorage.setItem('user', JSON.stringify(response.user))
 
-                setUser(response.user)
+                await getCurrentUser()
                 toast.success('login success')
                 navigate('/dashboard')
             } else {
@@ -27,7 +42,6 @@ export const useAuth = () => {
         } catch (error) {
             console.error('cannot post to auth Login, detail:', error)
             localStorage.removeItem('token')
-            localStorage.removeItem('user')
             toast.error('email or password not valid')
         } finally {
             setLoading(false)
@@ -51,7 +65,6 @@ export const useAuth = () => {
     const logout = async () => {
         await authApi.logout()
         localStorage.removeItem('token')
-        localStorage.removeItem('user')
         toast.success('logout success')
         navigate('/login')
     }
@@ -60,5 +73,6 @@ export const useAuth = () => {
         register,
         login,
         logout,
+        getCurrentUser
     }
 }

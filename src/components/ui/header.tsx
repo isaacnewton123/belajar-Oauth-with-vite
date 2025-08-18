@@ -20,7 +20,7 @@ const Header = ({children}: {children:string}) => {
                     <button className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
                         <i className="fas fa-bell text-slate-600"></i>
                     </button>
-                    <Button className="bg-red-600" onClick={() => logout}>
+                    <Button className="bg-red-600 cursor-pointer" onClick={logout}>
                         Log Out
                     </Button>
                 </div>

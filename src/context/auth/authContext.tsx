@@ -1,47 +1,50 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { jwtDecode } from 'jwt-decode'
+import { jwtDecode } from "jwt-decode";
 import type { User } from "../../services/types";
-import type { JwtPayload } from "jwt-decode";
 import { AuthContext } from "./useAuthContext";
 import Loading from "../../components/ui/loading";
+import type { MyJwtPayload } from "./types";
+import { useNavigate } from "react-router-dom";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
+
+    const navigate = useNavigate()
 
     useEffect(() => {
-        setLoading(true)
+        const token = localStorage.getItem('token');
+        const savedUserJSON = localStorage.getItem('user');
 
-        const token = localStorage.getItem('token')
-        const parsenUser = localStorage.getItem('user')
-
-
-        if (token && parsenUser) {
+        if (token && savedUserJSON) {
             try {
-                const isExpired = jwtDecode<JwtPayload>(token).exp! * 1000 < Date.now()
+                const isExpired = jwtDecode<MyJwtPayload>(token).exp * 1000 < Date.now();
+
                 if (isExpired) {
                     localStorage.removeItem('token')
                     localStorage.removeItem('user')
                     setUser(null)
+                    navigate('/login')
                 } else {
-                    const user = JSON.parse(parsenUser)
+                    localStorage.setItem('token', token)
+                    const user = JSON.parse(savedUserJSON)
                     setUser(user)
+                    navigate('/dashboard')
                 }
-
             } catch (error) {
-                console.error('error in useEffect AuthProvider', error)
+                console.error("Gagal mem-parse data, membersihkan storage.", error);
                 localStorage.removeItem('token')
                 localStorage.removeItem('user')
                 setUser(null)
+                navigate('/login')
             }
         }
-
-        setLoading(false)
-    }, [])
+        setLoading(false);
+    }, [navigate])
 
     if (loading) {
         return (
-            <Loading/>
+            <Loading />
         )
     }
 

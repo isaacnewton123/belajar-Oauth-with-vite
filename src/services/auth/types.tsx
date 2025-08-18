@@ -20,3 +20,8 @@ export interface ResponseRegister {
     user: User
 }
 
+export interface ResponseAuthMe {
+    success: boolean,
+    data: User
+}
+

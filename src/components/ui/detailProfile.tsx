@@ -12,7 +12,7 @@ const DetailProfile = ({user} : Profile) => {
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">User ID</label>
                     <div className="p-3 bg-slate-50 rounded-lg border">
-                        <p className="text-sm text-slate-900 font-mono">{user.id}</p>
+                        <p className="text-sm text-slate-900 font-mono">{user._id}</p>
                     </div>
                 </div>
                 <div>
