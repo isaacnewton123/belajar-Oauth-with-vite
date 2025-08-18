@@ -3,11 +3,13 @@ import { useAuthContext } from "../context/auth/useAuthContext"
 import { authApi } from "../services/auth/authApi"
 import type { LoginData, RegisterData } from "../services/auth/types"
 import { toast } from "react-toastify";
+import { useLoadingContext } from "../context/useLoadingContext";
 
 export const useAuth = () => {
 
-    const {setUser, setLoading} = useAuthContext()
+    const {setUser} = useAuthContext()
     const navigate = useNavigate()
+    const {setLoading} = useLoadingContext()
 
     const getCurrentUser = async() => {
         setLoading(true)

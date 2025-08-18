@@ -1,4 +1,3 @@
-import { useAuthContext } from "../context/auth/useAuthContext"
 import { useAuth } from "./useAuth"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
@@ -7,7 +6,6 @@ import { useCallback } from "react"
 
 export const useOauth = () => {
 
-    const { setLoading } = useAuthContext()
     const { getCurrentUser } = useAuth()
     const navigate = useNavigate()
 
@@ -15,28 +13,25 @@ export const useOauth = () => {
         window.location.href = `${baseURL}/auth/google`
     }
 
-    // Gunakan useCallback untuk "mengingat" fungsi ini
-    const googleCallback = useCallback(() => {
-        setLoading(true)
+    const googleCallback = useCallback(async() => {
+        console.log('log dari googleCallback')
         try {
-            const param = new URLSearchParams(location.search)
-            const token = param.get('token')
+            const param = new URLSearchParams(location.search);
+            const token = param.get("token");
 
             if (!token) {
-                throw new Error('token not found')
+                throw new Error("token not found");
             } else {
-                navigate('/dashboard')
-                localStorage.setItem('token', token)
-                toast.success('login success')
-                getCurrentUser()
+                localStorage.setItem("token", token);
+                await getCurrentUser();
+                toast.success("login success");
+                navigate("/dashboard", { replace: true });
             }
         } catch (error) {
-            console.error('google callback error', error)
-            toast.error('error, token not found')
-        } finally {
-            setLoading(false)
+            console.error("google callback error", error);
+            toast.error("error, token not found");
         }
-    }, [getCurrentUser, navigate, setLoading])
+    }, [getCurrentUser, navigate]);
 
     return {
         googleCallback,

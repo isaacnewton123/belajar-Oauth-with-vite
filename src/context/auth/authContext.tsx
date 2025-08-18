@@ -2,17 +2,19 @@ import { useEffect, useState, type ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
 import type { User } from "../../services/types";
 import { AuthContext } from "./useAuthContext";
-import Loading from "../../components/ui/loading";
 import type { MyJwtPayload } from "./types";
 import { useNavigate } from "react-router-dom";
+import { useLoadingContext } from "../useLoadingContext";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null)
-    const [loading, setLoading] = useState(true)
+
+    const {setLoading} = useLoadingContext()
 
     const navigate = useNavigate()
 
     useEffect(() => {
+        setLoading(true)
         const token = localStorage.getItem('token');
         const savedUserJSON = localStorage.getItem('user');
 
@@ -24,9 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     localStorage.removeItem('token')
                     localStorage.removeItem('user')
                     setUser(null)
-                    navigate('/login')
                 } else {
-                    localStorage.setItem('token', token)
                     const user = JSON.parse(savedUserJSON)
                     setUser(user)
                     navigate('/dashboard')
@@ -36,23 +36,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 localStorage.removeItem('token')
                 localStorage.removeItem('user')
                 setUser(null)
-                navigate('/login')
             }
         }
         setLoading(false);
-    }, [navigate])
-
-    if (loading) {
-        return (
-            <Loading />
-        )
-    }
+    }, [navigate, setLoading])
 
     const value = {
         user,
-        setUser,
-        loading,
-        setLoading
+        setUser
     }
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

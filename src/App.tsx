@@ -6,11 +6,13 @@ import { AuthProvider } from "./context/auth/authContext"
 import ProtectedRoute from "./components/protected-route"
 import DashboardPage from "./pages/dashboard"
 import OauthSuccess from "./pages/oauth-success"
+import { LoadingProvider } from "./context/loadingContext"
 
 function App() {
   return (
     <BrowserRouter>
       <ToastContainer />
+      <LoadingProvider>
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Navigate to={'/dashboard'} />} />
@@ -27,6 +29,7 @@ function App() {
             } />
         </Routes>
       </AuthProvider>
+      </LoadingProvider>
     </BrowserRouter>
   )
 }

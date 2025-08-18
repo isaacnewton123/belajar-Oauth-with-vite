@@ -7,8 +7,9 @@ const OauthSuccess = () => {
     const {googleCallback} = useOauth()
 
     useEffect(() => {
+        console.log('log useEffect')
         googleCallback()
-    }, [googleCallback])
+    }, [])
 
     return (
         <Loading/>
